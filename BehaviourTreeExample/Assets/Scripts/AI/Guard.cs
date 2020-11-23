@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
+using TAB.BehaviorTree;
 
 public class Guard : MonoBehaviour
 {
-    private BTBaseNode tree;
+    public Transform[] patrolPoints;
+
+    private Node tree;
     private NavMeshAgent agent;
     private Animator animator;
 
@@ -19,6 +22,9 @@ public class Guard : MonoBehaviour
     private void Start()
     {
         //Create your Behaviour Tree here!
+        NodePatrol nodePatrol = new NodePatrol(0.5f, patrolPoints, agent);
+
+        tree = new Selector(new List<Node> { nodePatrol });
     }
 
     private void FixedUpdate()

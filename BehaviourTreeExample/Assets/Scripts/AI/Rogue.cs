@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.AI;
+using TAB.BehaviorTree;
 
 public class Rogue : MonoBehaviour
 {
-
-    private BTBaseNode tree;
+    private Node tree;
     private NavMeshAgent agent;
     private Animator animator;
+
+    private Node topNode;
+
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -19,6 +22,9 @@ public class Rogue : MonoBehaviour
     private void Start()
     {
         //TODO: Create your Behaviour tree here
+        NodeChase nodeChase = new NodeChase(2, GameObject.FindWithTag("Player").transform, agent);
+
+        tree = new Selector(new List<Node> { nodeChase });
     }
 
     private void FixedUpdate()

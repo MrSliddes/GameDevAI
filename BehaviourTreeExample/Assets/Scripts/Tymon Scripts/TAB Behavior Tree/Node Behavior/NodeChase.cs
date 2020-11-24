@@ -15,6 +15,10 @@ namespace TAB.BehaviorTree
         /// </summary>
         private float minDistanceToTarget;
         /// <summary>
+        /// The maximum distance the navMeshAgent can be from the target before returning NodeState.failure
+        /// </summary>
+        private float maxDistanceToTarget;
+        /// <summary>
         /// The target transform the navMeshAgent moves towords
         /// </summary>
         private Transform target;
@@ -29,9 +33,10 @@ namespace TAB.BehaviorTree
         /// <param name="minDistanceToTarget">The minimum distance the navMeshAgent needs to be to the target before stopping</param>
         /// <param name="target">The target transform the navMeshAgent moves towords</param>
         /// <param name="navMeshAgent">The agent that will be moving towords target</param>
-        public NodeChase(float minDistanceToTarget, Transform target, NavMeshAgent navMeshAgent)
+        public NodeChase(float minDistanceToTarget, float maxDistanceToTarget, Transform target, NavMeshAgent navMeshAgent)
         {
             this.minDistanceToTarget = minDistanceToTarget;
+            this.maxDistanceToTarget = maxDistanceToTarget;
             this.target = target;
             this.navMeshAgent = navMeshAgent;
         }
@@ -43,19 +48,28 @@ namespace TAB.BehaviorTree
                 Debug.LogWarning("NavMeshAgent cannot reach path");
                 return NodeState.failure;
             }
+            if(target == null) return NodeState.failure;
 
             float distance = Vector3.Distance(target.position, navMeshAgent.transform.position);
-            if(distance > minDistanceToTarget)
+
+            if(distance >= maxDistanceToTarget)
             {
-                navMeshAgent.isStopped = false;
-                navMeshAgent.SetDestination(target.position);
-                return NodeState.running;
+                // Too far away
+                return NodeState.failure;
             }
-            else
+
+            if(distance <= minDistanceToTarget)
             {
                 // Close enough, stop
                 navMeshAgent.isStopped = true;
-                return NodeState.success;
+                return NodeState.success;                
+            }
+            else
+            {
+                // Running
+                navMeshAgent.isStopped = false;
+                navMeshAgent.SetDestination(target.position);
+                return NodeState.running;
             }            
         }
     }

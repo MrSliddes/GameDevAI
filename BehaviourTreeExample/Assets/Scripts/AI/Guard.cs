@@ -4,27 +4,49 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 using TAB.BehaviorTree;
+using TAB.FOV;
 
 public class Guard : MonoBehaviour
 {
     public Transform[] patrolPoints;
 
-    private Node tree;
+    private Selector tree;
     private NavMeshAgent agent;
     private Animator animator;
+
+    private Transform target = null;
 
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
-        animator = GetComponentInChildren<Animator>();
+        animator = GetComponentInChildren<Animator>();        
     }
 
     private void Start()
     {
         //Create your Behaviour Tree here!
+        #region patrolling
         NodePatrol nodePatrol = new NodePatrol(0.5f, patrolPoints, agent);
+        NodeSeeTarget nodeSeeTarget = new NodeSeeTarget(GetComponent<FieldOfView>(), target, transform);
 
-        tree = new Selector(new List<Node> { nodePatrol });
+        // Patrol group
+        Sequence sequencePatrolling = new Sequence(new List<Node> { nodePatrol, nodeSeeTarget});
+        #endregion
+
+        #region chasing
+        NodeChase nodeChase = new NodeChase(0.5f, 5, target, agent);
+
+        Sequence sequenceChasing = new Sequence(new List<Node> { nodeChase });
+        #endregion
+
+
+        tree = new Selector(new List<Node> { sequencePatrolling, sequenceChasing });
+
+        // Show NodeState in editor
+        if(Application.isEditor)
+        {
+            gameObject.AddComponent<ShowNodeTreeStatus>().AddConstructor(transform, tree);
+        }
     }
 
     private void FixedUpdate()

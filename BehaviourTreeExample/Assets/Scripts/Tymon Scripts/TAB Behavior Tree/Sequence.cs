@@ -12,7 +12,7 @@ namespace TAB.BehaviorTree
         /// <summary>
         /// The nodes that this sequence contains
         /// </summary>
-        protected List<Node> childNodes = new List<Node>();
+        public List<Node> childNodes = new List<Node>();
 
         /// <summary>
         /// Constructor

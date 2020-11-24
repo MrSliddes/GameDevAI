@@ -34,5 +34,5 @@ namespace TAB.BehaviorTree
         running,
         success,
         failure
-    }
+    }    
 }

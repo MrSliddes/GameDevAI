@@ -7,7 +7,7 @@ using TAB.BehaviorTree;
 
 public class Rogue : MonoBehaviour
 {
-    private Node tree;
+    private Selector tree;
     private NavMeshAgent agent;
     private Animator animator;
 
@@ -22,9 +22,15 @@ public class Rogue : MonoBehaviour
     private void Start()
     {
         //TODO: Create your Behaviour tree here
-        NodeChase nodeChase = new NodeChase(2, GameObject.FindWithTag("Player").transform, agent);
+        NodeChase nodeChase = new NodeChase(1, 5, GameObject.FindWithTag("Player").transform, agent);
 
         tree = new Selector(new List<Node> { nodeChase });
+
+        // Show NodeState in editor
+        if(Application.isEditor)
+        {
+            gameObject.AddComponent<ShowNodeTreeStatus>().AddConstructor(transform, tree);
+        }
     }
 
     private void FixedUpdate()

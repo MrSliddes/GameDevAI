@@ -5,14 +5,14 @@ using UnityEngine;
 namespace TAB.BehaviorTree
 {
     /// <summary>
-    /// Selector node
+    /// Selector node. Checks child node, if it fails it gos to the next one to check if that one succeeds. Returns success if a child returns success.
     /// </summary>
     public class Selector : Node
     {
         /// <summary>
         /// The child nodes that this selector contains
         /// </summary>
-        protected List<Node> childNodes = new List<Node>();
+        public List<Node> childNodes = new List<Node>();
 
         /// <summary>
         /// Constructor
@@ -38,7 +38,7 @@ namespace TAB.BehaviorTree
                         return nodeState;
                     case NodeState.success:
                         nodeState = NodeState.success;
-                        return NodeState.success;
+                        return nodeState;
                     case NodeState.failure:
                         // Nothing, evaluate next child
                         break;

@@ -35,9 +35,10 @@ namespace TAB.BehaviorTree
         }
 
         public override NodeState Run()
-        {
+        {            
             // Move agent to current patrol point
             navMeshAgent.SetDestination(patrolPoints[currentPatrolPoint].position);
+            navMeshAgent.isStopped = false;
             // Check if agent reached point
             if(Vector3.Distance(navMeshAgent.transform.position, patrolPoints[currentPatrolPoint].position) <= patrolPointRange)
             {
@@ -45,7 +46,8 @@ namespace TAB.BehaviorTree
                 currentPatrolPoint++;
                 currentPatrolPoint = currentPatrolPoint == patrolPoints.Length ? currentPatrolPoint = 0 : currentPatrolPoint; // If current patrol point is the last, loop back to 0, else just keep the currentPatrolPoint
             }
-            return NodeState.running;
+            nodeState = NodeState.success;
+            return nodeState;
         }
     }
 }

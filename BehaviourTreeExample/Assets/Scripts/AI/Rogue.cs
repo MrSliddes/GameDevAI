@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.AI;
 using TAB.BehaviorTree;
+using TAB.VariableTypes;
 
 public class Rogue : MonoBehaviour
 {
@@ -12,6 +13,8 @@ public class Rogue : MonoBehaviour
     private Animator animator;
 
     private Node topNode;
+
+    private VariableTransform target;
 
     private void Awake()
     {
@@ -22,7 +25,13 @@ public class Rogue : MonoBehaviour
     private void Start()
     {
         //TODO: Create your Behaviour tree here
-        NodeChase nodeChase = new NodeChase(1, 5, GameObject.FindWithTag("Player").transform, agent);
+
+
+        print(GameObject.FindWithTag("Player").transform);
+        target = (VariableTransform)ScriptableObject.CreateInstance("VariableTransform"); //(VariableType<Transform>)ScriptableObject.CreateInstance(VariableType<Transform>);
+        print(target);
+        target.Value = GameObject.FindWithTag("Player").transform;
+        NodeChase nodeChase = new NodeChase(2, 5, target, agent, 1f);
 
         tree = new Selector(new List<Node> { nodeChase });
 

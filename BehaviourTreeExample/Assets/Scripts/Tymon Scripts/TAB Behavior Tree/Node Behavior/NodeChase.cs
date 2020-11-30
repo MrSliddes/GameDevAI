@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using TAB.VariableTypes;
 
 namespace TAB.BehaviorTree
 {
@@ -21,11 +22,17 @@ namespace TAB.BehaviorTree
         /// <summary>
         /// The target transform the navMeshAgent moves towords
         /// </summary>
-        private Transform target;
+        private VariableTransform target;
         /// <summary>
         /// The agent that will be moving towords target
         /// </summary>
         private NavMeshAgent navMeshAgent;
+        /// <summary>
+        /// The time the objects stays agroed to target
+        /// </summary>
+        private float agroTime;
+
+        private float agroTimer;
 
         /// <summary>
         /// Constructor
@@ -33,43 +40,64 @@ namespace TAB.BehaviorTree
         /// <param name="minDistanceToTarget">The minimum distance the navMeshAgent needs to be to the target before stopping</param>
         /// <param name="target">The target transform the navMeshAgent moves towords</param>
         /// <param name="navMeshAgent">The agent that will be moving towords target</param>
-        public NodeChase(float minDistanceToTarget, float maxDistanceToTarget, Transform target, NavMeshAgent navMeshAgent)
+        public NodeChase(float minDistanceToTarget, float maxDistanceToTarget, VariableTransform target, NavMeshAgent navMeshAgent, float agroTime)
         {
             this.minDistanceToTarget = minDistanceToTarget;
             this.maxDistanceToTarget = maxDistanceToTarget;
             this.target = target;
             this.navMeshAgent = navMeshAgent;
+            this.agroTime = agroTime;
+            agroTimer = agroTime;
         }
 
         public override NodeState Run()
         {
+            agroTimer -= Time.fixedDeltaTime; // keep in mind that the tree is run in fixedupdate
+            if(agroTimer < 0) agroTimer = 0;
+            Debug.Log(agroTimer);
+
             if(navMeshAgent.pathStatus == NavMeshPathStatus.PathInvalid)
             {
                 Debug.LogWarning("NavMeshAgent cannot reach path");
-                return NodeState.failure;
+                nodeState = NodeState.failure;
+                return nodeState;
             }
-            if(target == null) return NodeState.failure;
+            if(target.Value == null)
+            {
+                nodeState = NodeState.failure;
+                Debug.Log("no target");
+                return nodeState;
+            }            
 
-            float distance = Vector3.Distance(target.position, navMeshAgent.transform.position);
+            float distance = Vector3.Distance(target.Value.position, navMeshAgent.transform.position);
+            navMeshAgent.SetDestination(target.Value.position);
 
-            if(distance >= maxDistanceToTarget)
+            if(distance >= maxDistanceToTarget && agroTimer <= 0)
             {
                 // Too far away
-                return NodeState.failure;
+                Debug.Log("too far & lost agro");
+                target.Value = null;
+                agroTimer = agroTime;
+                navMeshAgent.isStopped = true;
+                nodeState = NodeState.failure;
+                return nodeState;
             }
 
             if(distance <= minDistanceToTarget)
             {
                 // Close enough, stop
                 navMeshAgent.isStopped = true;
-                return NodeState.success;                
+                Debug.Log("close enough");
+                nodeState = NodeState.success;
+                return nodeState;                
             }
             else
             {
                 // Running
                 navMeshAgent.isStopped = false;
-                navMeshAgent.SetDestination(target.position);
-                return NodeState.running;
+                Debug.Log("running");
+                nodeState = NodeState.running;
+                return nodeState;
             }            
         }
     }

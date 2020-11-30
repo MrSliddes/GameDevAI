@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using TAB.VariableTypes;
 
 namespace TAB.BehaviorTree
 {
@@ -9,6 +10,14 @@ namespace TAB.BehaviorTree
     {
         private float attackRange;
         private NavMeshAgent navMeshAgent;
+        private VariableTransform target;
+
+        public NodeAttack(float attackRange, NavMeshAgent navMeshAgent, VariableTransform target)
+        {
+            this.attackRange = attackRange;
+            this.navMeshAgent = navMeshAgent;
+            this.target = target;
+        }
 
         public override NodeState Run()
         {
@@ -37,6 +46,8 @@ namespace TAB.BehaviorTree
             }
 
             // Attack closest
+            Debug.Log("Attack");
+            target.Value = null;
             closest.GetComponent<IDamageable>().TakeDamage(navMeshAgent.gameObject, 1);
             return NodeState.success;
         }

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace TAB.BehaviorTree
 {
     /// <summary>
-    /// Sequence node, meaning every node in the sequence needs to be success or it will be a failure
+    /// Sequence node, meaning every node in the sequence needs to be success or it will be a failure (similar to an "and" operation)
     /// </summary>
     public class Sequence : Node
     {
@@ -29,19 +29,16 @@ namespace TAB.BehaviorTree
         /// <returns></returns>
         public override NodeState Run()
         {
-            bool isAnyNodeRunning = false;
             foreach(var node in childNodes)
             {
                 switch(node.Run())
                 {
                     case NodeState.running:
-                        isAnyNodeRunning = true;
-                        break;
+                        nodeState = NodeState.running;
+                        return nodeState;
                     case NodeState.success:
-                        // Continue
-                        break;
+                        continue;
                     case NodeState.failure:
-                        // Whole sequence is a failure
                         nodeState = NodeState.failure;
                         return nodeState;
                     default:
@@ -49,7 +46,7 @@ namespace TAB.BehaviorTree
                 }
             }
             // Check if sequence is success
-            nodeState = isAnyNodeRunning ? NodeState.running : NodeState.success;
+            nodeState = NodeState.success;
             return nodeState;
         }
     }

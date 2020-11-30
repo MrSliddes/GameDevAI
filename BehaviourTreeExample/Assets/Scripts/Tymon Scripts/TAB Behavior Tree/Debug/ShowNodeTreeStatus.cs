@@ -42,10 +42,7 @@ public class ShowNodeTreeStatus : MonoBehaviour
                 nodes.AddRange(s.childNodes);
             }
 
-            if(nodes[i].NodeState == NodeState.running)
-            {
-                info += "\n" + nodes[i].GetType().Name + ": " + nodes[i].NodeState;
-            }
+            info += "\n" + nodes[i].GetType().Name + ": " + nodes[i].NodeState;
         }
         GUI.color = Color.black;
         Handles.Label(origin.position + Vector3.up * 4, info);

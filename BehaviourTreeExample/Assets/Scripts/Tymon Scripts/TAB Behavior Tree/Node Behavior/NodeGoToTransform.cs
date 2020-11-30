@@ -21,13 +21,14 @@ namespace TAB.BehaviorTree
         public override NodeState Run()
         {
             // Go towords defined target
+            navMeshAgent.SetDestination(target.position);
             // Check if agent is close engouh
             if(Vector3.Distance(navMeshAgent.transform.position, target.position) <= minDistanceToTarget)
             {
                 return NodeState.success;
             }
-            navMeshAgent.SetDestination(target.position);
             return NodeState.running;
+            // Should add a failed option, example if it takes too long to go to transform
         }
     }
 }

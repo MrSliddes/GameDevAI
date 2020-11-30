@@ -5,7 +5,7 @@ using UnityEngine;
 namespace TAB.BehaviorTree
 {
     /// <summary>
-    /// Selector node. Checks child node, if it fails it gos to the next one to check if that one succeeds. Returns success if a child returns success.
+    /// Selector node. Checks child node, if it fails it gos to the next one to check if that one succeeds. Returns success if a child returns success. (similar to an "or" function. Will keep playing until a child returns success)
     /// </summary>
     public class Selector : Node
     {

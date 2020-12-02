@@ -31,8 +31,11 @@ namespace TAB.BehaviorTree
         /// The time the objects stays agroed to target
         /// </summary>
         private float agroTime;
-
         private float agroTimer;
+        /// <summary>
+        /// When to far away, will the object lose the target transform?
+        /// </summary>
+        private bool loseTargetTransform;
 
         /// <summary>
         /// Constructor
@@ -40,7 +43,7 @@ namespace TAB.BehaviorTree
         /// <param name="minDistanceToTarget">The minimum distance the navMeshAgent needs to be to the target before stopping</param>
         /// <param name="target">The target transform the navMeshAgent moves towords</param>
         /// <param name="navMeshAgent">The agent that will be moving towords target</param>
-        public NodeChase(float minDistanceToTarget, float maxDistanceToTarget, VariableTransform target, NavMeshAgent navMeshAgent, float agroTime)
+        public NodeChase(float minDistanceToTarget, float maxDistanceToTarget, VariableTransform target, NavMeshAgent navMeshAgent, float agroTime, bool loseTargetTransform)
         {
             this.minDistanceToTarget = minDistanceToTarget;
             this.maxDistanceToTarget = maxDistanceToTarget;
@@ -48,13 +51,13 @@ namespace TAB.BehaviorTree
             this.navMeshAgent = navMeshAgent;
             this.agroTime = agroTime;
             agroTimer = agroTime;
+            this.loseTargetTransform = loseTargetTransform;
         }
 
         public override NodeState Run()
         {
             agroTimer -= Time.fixedDeltaTime; // keep in mind that the tree is run in fixedupdate
             if(agroTimer < 0) agroTimer = 0;
-            Debug.Log(agroTimer);
 
             if(navMeshAgent.pathStatus == NavMeshPathStatus.PathInvalid)
             {
@@ -76,17 +79,18 @@ namespace TAB.BehaviorTree
             {
                 // Too far away
                 Debug.Log("too far & lost agro");
-                target.Value = null;
+                if(loseTargetTransform) target.Value = null;
                 agroTimer = agroTime;
-                navMeshAgent.isStopped = true;
+                //navMeshAgent.isStopped = false;
                 nodeState = NodeState.failure;
                 return nodeState;
             }
 
+            navMeshAgent.stoppingDistance = minDistanceToTarget;
             if(distance <= minDistanceToTarget)
             {
                 // Close enough, stop
-                navMeshAgent.isStopped = true;
+                //navMeshAgent.isStopped = true;
                 Debug.Log("close enough");
                 nodeState = NodeState.success;
                 return nodeState;                
@@ -94,7 +98,7 @@ namespace TAB.BehaviorTree
             else
             {
                 // Running
-                navMeshAgent.isStopped = false;
+                //navMeshAgent.isStopped = false;
                 Debug.Log("running");
                 nodeState = NodeState.running;
                 return nodeState;

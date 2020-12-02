@@ -22,12 +22,15 @@ namespace TAB.BehaviorTree
         {
             // Go towords defined target
             navMeshAgent.SetDestination(target.position);
+            navMeshAgent.stoppingDistance = minDistanceToTarget;
             // Check if agent is close engouh
             if(Vector3.Distance(navMeshAgent.transform.position, target.position) <= minDistanceToTarget)
             {
-                return NodeState.success;
+                nodeState = NodeState.success;
+                return nodeState;
             }
-            return NodeState.running;
+            nodeState = NodeState.running;
+            return nodeState;
             // Should add a failed option, example if it takes too long to go to transform
         }
     }

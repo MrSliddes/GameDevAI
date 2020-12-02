@@ -23,7 +23,11 @@ namespace TAB.BehaviorTree
         {
             // Check for damageable object
             Collider[] targetsInViewRadius = Physics.OverlapSphere(navMeshAgent.transform.position, attackRange);
-            if(targetsInViewRadius.Length == 0) return NodeState.failure;
+            if(targetsInViewRadius.Length == 0)
+            {
+                nodeState = NodeState.failure;
+                return nodeState;
+            }
 
             // Get those that have IDamagable
             List<Transform> targets = new List<Transform>();
@@ -31,7 +35,11 @@ namespace TAB.BehaviorTree
             {
                 if(item.GetComponent<IDamageable>() != null) targets.Add(item.transform);
             }
-            if(targets.Count == 0) return NodeState.failure;
+            if(targets.Count == 0)
+            {
+                nodeState = NodeState.failure;
+                return nodeState;
+            }
 
             // Get the closest
             Transform closest = targets[0];

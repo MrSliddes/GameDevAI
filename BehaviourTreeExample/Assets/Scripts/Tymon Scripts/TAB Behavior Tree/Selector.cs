@@ -41,7 +41,7 @@ namespace TAB.BehaviorTree
                         return nodeState;
                     case NodeState.failure:
                         // Nothing, evaluate next child
-                        break;
+                        continue;
                     default:
                         break;
                 }

@@ -32,6 +32,7 @@ namespace TAB.BehaviorTree
             if(fov.visibleTargets.Count <= 0)
             {
                 Debug.Log("f");
+                target.Value = null;
                 nodeState = NodeState.failure;
                 return nodeState;
             }

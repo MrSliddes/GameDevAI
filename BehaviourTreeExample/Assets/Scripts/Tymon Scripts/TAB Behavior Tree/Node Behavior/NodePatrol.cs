@@ -39,6 +39,7 @@ namespace TAB.BehaviorTree
             // Move agent to current patrol point
             navMeshAgent.SetDestination(patrolPoints[currentPatrolPoint].position);
             navMeshAgent.isStopped = false;
+            navMeshAgent.stoppingDistance = 0;
             // Check if agent reached point
             if(Vector3.Distance(navMeshAgent.transform.position, patrolPoints[currentPatrolPoint].position) <= patrolPointRange)
             {

@@ -15,7 +15,8 @@ public class Guard : MonoBehaviour
     private NavMeshAgent agent;
     private Animator animator;
 
-    private VariableTransform target;
+    [HideInInspector] public bool isSmoked = false;
+    [HideInInspector] public VariableTransform target;
     private VariableBool hasWeapon;
 
     private void Awake()
@@ -39,25 +40,25 @@ public class Guard : MonoBehaviour
         NodeHasTarget nodeHasTarget = new NodeHasTarget(target);
         Invertor invertorNodeHasTarget = new Invertor(nodeHasTarget);
         // Patrol group
-        Sequence sequencePatrolling = new Sequence(new List<Node> { invertorNodeHasTarget, nodePatrol, invertorSeeTarget });
+        Sequence sequencePatrolling = new Sequence( invertorNodeHasTarget, nodePatrol, invertorSeeTarget );
         #endregion
 
         #region chasing
         NodeCheckBool nodeHasWeapon = new NodeCheckBool(hasWeapon);
         NodeGoToTransform nodeGoToTransform = new NodeGoToTransform(1f, GameObject.FindWithTag("Weapon").transform, agent);
         NodeGetWeapon nodeGetWeapon = new NodeGetWeapon(1f, GameObject.FindWithTag("Weapon").transform, agent, hasWeapon);
-        NodeChase nodeChase = new NodeChase(1f, 5, target, agent, 5f);
+        NodeChase nodeChase = new NodeChase(1f, 5, target, agent, 5f, true);
         NodeAttack nodeAttack = new NodeAttack(1f, agent, target);
 
-        Sequence sequenceC1 = new Sequence(new List<Node> { nodeGoToTransform, nodeGetWeapon});
-        Selector selectorC1 = new Selector(new List<Node> { nodeHasWeapon, sequenceC1});
+        Sequence sequenceC1 = new Sequence( nodeGoToTransform, nodeGetWeapon);
+        Selector selectorC1 = new Selector(new List<Node>() { nodeHasWeapon, sequenceC1 }); // param
 
-        Sequence sequenceChasing = new Sequence(new List<Node> { selectorC1, nodeChase, nodeHasTarget, nodeAttack });
+        Sequence sequenceChasing = new Sequence(nodeHasTarget, selectorC1, nodeChase,  nodeAttack);
         
         #endregion
 
 
-        tree = new Selector(new List<Node> { sequencePatrolling, sequenceChasing });
+        tree = new Selector(new List<Node> { sequenceChasing, sequencePatrolling });
 
         // Show NodeState in editor
         if(Application.isEditor)
@@ -68,8 +69,23 @@ public class Guard : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if(isSmoked) return;
         tree?.Run();
         print(target.Value);
+    }
+
+    public void Smoked()
+    {
+        StartCoroutine(WaitOutSmoke());
+    }
+    
+    private IEnumerator WaitOutSmoke()
+    {
+        target.Value = null;
+        isSmoked = true;
+        yield return new WaitForSeconds(5f);
+        isSmoked = false;
+        yield break;
     }
 
     //private void OnDrawGizmos()

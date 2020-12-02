@@ -8,6 +8,8 @@ using TAB.VariableTypes;
 
 public class Rogue : MonoBehaviour
 {
+    public LayerMask enemyLayerMask;
+
     private Selector tree;
     private NavMeshAgent agent;
     private Animator animator;
@@ -25,15 +27,22 @@ public class Rogue : MonoBehaviour
     private void Start()
     {
         //TODO: Create your Behaviour tree here
-
-
-        print(GameObject.FindWithTag("Player").transform);
         target = (VariableTransform)ScriptableObject.CreateInstance("VariableTransform"); //(VariableType<Transform>)ScriptableObject.CreateInstance(VariableType<Transform>);
-        print(target);
         target.Value = GameObject.FindWithTag("Player").transform;
-        NodeChase nodeChase = new NodeChase(2, 5, target, agent, 1f);
 
-        tree = new Selector(new List<Node> { nodeChase });
+        NodeEnemyIsAggro nodeEnemyIsAggro = new NodeEnemyIsAggro(10, enemyLayerMask, transform);
+        //Invertor invertorNodeEnemyIsAggro = new Invertor(nodeEnemyIsAggro);
+        NodeChase nodeChase = new NodeChase(2, 5, target, agent, 5f, true);
+
+        Sequence sequenceFollow = new Sequence(nodeChase );
+
+        NodeGoToTransform nodeGoToTransform = new NodeGoToTransform(0.5f, GameObject.FindWithTag("HidingSpot").transform, agent);
+        NodeTrowSmokeAtEnemy nodeTrowSmokeAtEnemy = new NodeTrowSmokeAtEnemy(1f, enemyLayerMask, 10, transform);
+        //Invertor invertorNodeTrowSmokeAtEnemy = new Invertor(nodeTrowSmokeAtEnemy);
+
+        Sequence sequenceSmoking = new Sequence (nodeEnemyIsAggro, nodeGoToTransform, nodeTrowSmokeAtEnemy);
+
+        tree = new Selector(new List<Node> { sequenceSmoking, sequenceFollow });
 
         // Show NodeState in editor
         if(Application.isEditor)

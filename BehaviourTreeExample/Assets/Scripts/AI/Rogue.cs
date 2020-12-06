@@ -32,7 +32,7 @@ public class Rogue : MonoBehaviour
 
         NodeEnemyIsAggro nodeEnemyIsAggro = new NodeEnemyIsAggro(10, enemyLayerMask, transform);
         //Invertor invertorNodeEnemyIsAggro = new Invertor(nodeEnemyIsAggro);
-        NodeChase nodeChase = new NodeChase(2, 5, target, agent, 5f, true);
+        NodeChase nodeChase = new NodeChase(2, 5, target, agent, 5f, false);
 
         Sequence sequenceFollow = new Sequence(nodeChase );
 
